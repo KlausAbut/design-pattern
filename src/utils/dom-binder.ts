@@ -6,13 +6,9 @@ import { Observable } from '../core/observer';
  * @param observable L'état à observer.
  * @returns Une fonction pour casser la liaison (désabonnement).
  */
-export function bindText(element: HTMLElement, observable: Observable<any>): () => void {
-  // On s'abonne aux changements de l'Observable
-  const unsubscribe = observable.subscribe((value) => {
-    // À chaque changement, on met à jour le texte de l'élément en direct
+export function bindText<T>(element: HTMLElement, observable: Observable<T>): () => void {
+  const unsubscribe = observable.subscribe((value: T) => { // <-- Ajout de : T
     element.textContent = String(value);
   });
-
-  // On retourne la fonction pour permettre le nettoyage de la mémoire plus tard
   return unsubscribe;
 }
