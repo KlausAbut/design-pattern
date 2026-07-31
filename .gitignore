@@ -1,5 +1,5 @@
 **/.npm
 **/dist
 **/node_modules
-**/.env
 **/.node_repl_history
+.env
