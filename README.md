@@ -8,16 +8,11 @@
 ## Development Server
 
 ```bash
-docker compose up -d
-docker compose exec node npm install
-docker compose exec node npm run dev
+docker compose up --build -d
 ```
 
 ## Build the app
 
 ```bash
-docker compose up -d
-docker compose exec node npm install
-docker compose exec node npm run build
 docker compose up --build -d
 ```
