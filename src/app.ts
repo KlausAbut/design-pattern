@@ -27,20 +27,48 @@ export function bootstrapApp(rootElement: HTMLElement) {
       .build();
   });
 
-  // --- VUE 2 : LISTE DES JOUEURS (Utilise les composants de ton binôme) ---
+  // --- VUE 2 : LISTE DES JOUEURS ---
   router.addRoute("/joueurs", () => {
     const page = document.createElement("div");
 
-    // On utilise la Card et la List de ton binôme !
-    const listeJoueurs = new List({
-      items: playersState.getValue(), // On lit l'état actuel de ton Observable
-      onSelect: (name) => alert(`Joueur sélectionné : ${name}`),
-    });
+    // On crée un conteneur spécifique pour la carte. 
+    // Cela permet de vider et re-remplir uniquement cette zone quand on supprime un joueur.
+    const cardContainer = document.createElement("div");
 
-    const card = new Card({
-      title: "Joueurs Inscrits",
-      children: [listeJoueurs],
-    });
+    // Fonction pour générer et rafraîchir dynamiquement l'affichage de la liste
+    const renderList = () => {
+      cardContainer.innerHTML = ""; // On nettoie l'ancien affichage
+
+      const listeJoueurs = new List({
+        items: playersState.getValue(),
+        onSelect: (name) => {
+          // 1. On demande confirmation
+          const confirmDelete = window.confirm(`Voulez-vous vraiment supprimer le joueur ${name} ?`);
+          
+          if (confirmDelete) {
+            // 2. On filtre le tableau pour retirer le nom sélectionné
+            const currentPlayers = playersState.getValue();
+            const updatedPlayers = currentPlayers.filter(p => p !== name);
+            
+            // 3. On met à jour l'état (ce qui sauvegarde automatiquement grâce à ton Observer)
+            playersState.next(updatedPlayers);
+            
+            // 4. On relance le rendu de la carte pour afficher la nouvelle liste
+            renderList();
+          }
+        },
+      });
+
+      const card = new Card({
+        title: "Joueurs Inscrits",
+        children: [listeJoueurs],
+      });
+
+      card.mount(cardContainer);
+    };
+
+    // On appelle la fonction une première fois pour le chargement initial
+    renderList();
 
     // Boutons de navigation
     const navButtons = new TagBuilder("div")
@@ -58,13 +86,13 @@ export function bootstrapApp(rootElement: HTMLElement) {
       )
       .build();
 
-    card.mount(page); // Montage du composant de ton binôme
+    page.appendChild(cardContainer);
     page.appendChild(navButtons);
 
     return page;
   });
 
-  // --- VUE 3 : FORMULAIRE D'INSCRIPTION (Binding bidirectionnel et Validation) ---
+  // --- VUE 3 : FORMULAIRE D'INSCRIPTION ---
   router.addRoute("/inscription", () => {
     const page = new TagBuilder("div").withClass("page-form").build();
 
