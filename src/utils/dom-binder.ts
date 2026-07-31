@@ -8,7 +8,7 @@ import { Observable } from '../core/observer';
  */
 export function bindText<T>(element: HTMLElement, observable: Observable<T>): () => void {
   const unsubscribe = observable.subscribe((value: T) => { // <-- Ajout de : T
-    element.textContent = String(value);
+    element.textContent = value == null ? "" : String(value);
   });
   return unsubscribe;
 }

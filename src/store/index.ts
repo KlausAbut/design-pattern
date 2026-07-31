@@ -6,8 +6,9 @@ import { Observable } from "../core/observer";
 export const globalStore = AppStore.getInstance(new LocalStorageAdapter());
 
 // 2. On expose des états réactifs (Observables de ton côté) liés à la donnée initiale du store
-// Si le store est vide (premier lancement), on initialise avec un tableau vide.
-const initialPlayers = globalStore.getState<string[]>("players") ?? [];
+// getState() ne lit que le cache mémoire (vide au premier chargement) : il faut d'abord
+// hydrater le Singleton depuis le localStorage (asynchrone) avant de créer l'Observable.
+const initialPlayers = (await globalStore.hydrate<string[]>("players")) ?? [];
 export const playersState = new Observable<string[]>(initialPlayers);
 
 // Chaque fois que l'observable change, on met à jour le Store de ton binôme pour sauvegarder
